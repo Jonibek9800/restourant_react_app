@@ -60,7 +60,7 @@ const NavBar = () => {
           placement="right"
           onClose={onClose}
           style={{ backgroundColor: "#e6e2d8" }}
-          visible={visible}
+          open={visible}
         >
           <Menu
             onClick={onClick}

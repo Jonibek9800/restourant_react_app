@@ -2,10 +2,12 @@ import React from "react";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { Button, Checkbox, Form, Input, Layout } from "antd";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { auth } from "../../store/features/auth/auth";
+import { useEffect } from "react";
 const Login = () => {
   const dispatch = useDispatch();
+  const errorMessage = useSelector(state => state.user.errorMessage)
   const [formData, setFormData] = useState({
     username: "",
     password: "",
@@ -15,8 +17,11 @@ const Login = () => {
     username: false,
     password: false,
   })
-
-  const onFinish = (values) => {
+  const [error, setError] = useState(null);
+  useEffect(() => {
+    setError(errorMessage)
+  }, [errorMessage])
+  const onFinish = () => {
     dispatch(auth(formData))
   };
 
@@ -79,7 +84,7 @@ const Login = () => {
             placeholder="Password"
             style={passwordStyle()}
           />
-          {validate.password && formData.password === "" ? <span style={{ color: 'red' }}>Пожалуйста заполните это поле!</span> : ""}
+          {errorMessage != null ? <span style={{ color: 'red' }}>{errorMessage}</span> : validate.password && formData.password === "" ? <span style={{ color: 'red' }}>Пожалуйста заполните это поле!</span> : ""}
         </Form.Item>
         <Form.Item>
           <Form.Item name="remember" valuePropName="checked" noStyle>
@@ -101,7 +106,6 @@ const Login = () => {
           >
             Log in
           </Button>
-          {/* Or <a href="">register now!</a> */}
         </Form.Item>
       </Form>
     </Layout>

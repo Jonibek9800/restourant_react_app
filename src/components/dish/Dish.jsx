@@ -3,9 +3,10 @@ import Meta from "antd/es/card/Meta";
 import { Button, Flex, Space, Tooltip } from "antd";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { cancelOrderedDish, handleOrderFood } from "../../store/features/table_reservation/table_reservation";
+import { cancelOrderedDish, handleOrderFood, totalOrderPrice } from "../../store/features/table_reservation/table_reservation";
+import { useEffect } from "react";
 
-const Dish = ({ dish, }) => {
+const Dish = ({ dish, setTotalSum, totalSum }) => {
     const orderedFood = useSelector(state => state.table.orderedFood)
     const dispatch = useDispatch();
     const [quantity, setQuantity] = useState(1);
@@ -22,7 +23,6 @@ const Dish = ({ dish, }) => {
         }
     }
 
-
     const removeOrder = (dishId) => {
 
         const newArr = orderedFood.filter(item => item.dish.id !== dishId)
@@ -35,7 +35,11 @@ const Dish = ({ dish, }) => {
             setQuantity(quantity - 1);
         }
     };
+
+    useEffect(() => { dispatch(totalOrderPrice(totalSum)); }, [totalSum]);
+
     const handleOrder = (dish) => {
+        setTotalSum(prev => prev += (dish.price * quantity))
         const updateOrderedFood = [...orderedFood, { dish, quantity }]
         dispatch(handleOrderFood(updateOrderedFood))
     };
@@ -47,11 +51,10 @@ const Dish = ({ dish, }) => {
             cover={<img style={{ height: 200, borderRadius: 10 }} alt="" src={dish.image} />}
         >
             <Meta
-                style={{ fontSize: 18 }}
-                title={<Tooltip title={dish.foodName}><span style={{ fontSize: 24 }}>{dish.foodName}</span></Tooltip>}
+                style={{ fontSize: 16 }}
+                title={<Tooltip title={dish.foodName}><span style={{ fontSize: 20 }}>{dish.foodName}</span></Tooltip>}
                 description={`Калорийность ${dish.calories}`}
             />
-            {/* <Title style={{ fontSize: 24 }}>{dish.foodName}</Title> */}
             <h4 style={{ fontSize: 16 }}>{dish.price} c</h4>
             <div>
                 {!isAddFood() ? (
@@ -63,7 +66,6 @@ const Dish = ({ dish, }) => {
                     </Space>
                 ) : (
                     <Space>
-                        {/* <Button onClick={() => upgradeOrder(dish.id)}>Изменить</Button> */}
                         <Button onClick={() => removeOrder(dish.id)}>Отменить</Button>
                     </Space>
                 )}

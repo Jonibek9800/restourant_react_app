@@ -21,7 +21,7 @@ export const authSlice = createSlice({
       state.isLoading = action.payload;
     },
     authUser: (state, { payload }) => {
-      console.log(state.users);
+      state.errorMessage = null;
       state.users.forEach((item) => {
         console.log(
           item.name === payload.username && item.password === payload.password
@@ -34,6 +34,8 @@ export const authSlice = createSlice({
           localStorage.setItem("user", JSON.stringify(item));
           state.user = item;
           state.isAuth = true;
+        } else {
+          state.errorMessage = "Неверный логин или пароль";
         }
       });
     },
@@ -41,7 +43,7 @@ export const authSlice = createSlice({
       state.isAuth = action.payload.isAuth;
       state.user = action.payload.user;
     },
-    logout: (state, action) => {
+    logout: (state) => {
       state.isAuth = false;
       state.user = null;
       localStorage.setItem("user", "");
@@ -81,7 +83,11 @@ export const auth =
   };
 
 export const checkAuth = () => async (dispatch) => {
-  const user = JSON.parse(localStorage.getItem("user"));
+  const strUser = localStorage.getItem("user");
+  let user = null;
+  if (strUser != "") {
+    user = JSON.parse(strUser);
+  }
   if (user !== null) {
     dispatch(checkIsAuth({ user, isAuth: true }));
   }
